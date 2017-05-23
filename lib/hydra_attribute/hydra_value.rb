@@ -37,9 +37,18 @@ module HydraAttribute
       @entity     = entity
       @attributes = attributes
       if attributes.has_key?(:value)
-        @value = column.type_cast(attributes[:value])
+        @value = column.type_cast_from_database(attributes[:value])
       else
-        @value = column.type_cast(column.default)
+        @value = case column.cast_type
+                 when 'datetime'
+                   ::ActiveRecord::Type::DateTime.new.type_cast_from_database(column.default)
+                 when 'decimal'
+                   ::ActiveRecord::Type::Decimal.new.type_cast_from_database(column.default)
+                 when 'string'
+                   ::ActiveRecord::Type::String.new.type_cast_from_database(column.default)
+                 else
+                   raise "#{column.cast_type} not supportted"
+                 end
         attributes[:value] = column.default
       end
     end

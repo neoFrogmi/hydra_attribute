@@ -397,7 +397,7 @@ module HydraAttribute
         # @param [Object] value
         # @return [Object] type casted value
         def type_cast_value(name, value)
-          self.class.symbolized_columns_hash[name].type_cast(value)
+          self.class.symbolized_columns_hash[name].type_cast_from_database(value)
         end
 
         # Redefine method for auto generation attribute methods
