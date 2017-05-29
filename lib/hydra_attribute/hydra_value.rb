@@ -36,19 +36,11 @@ module HydraAttribute
       raise HydraAttributeIdIsMissedError unless attributes.has_key?(:hydra_attribute_id)
       @entity     = entity
       @attributes = attributes
+      type_cast = column.respond_to?(:type_cast) ? :type_cast : :type_cast_from_database
       if attributes.has_key?(:value)
-        @value = column.type_cast_from_database(attributes[:value])
+        @value = column.send(type_cast, attributes[:value])
       else
-        @value = case column.cast_type
-                 when 'datetime'
-                   ::ActiveRecord::Type::DateTime.new.type_cast_from_database(column.default)
-                 when 'decimal'
-                   ::ActiveRecord::Type::Decimal.new.type_cast_from_database(column.default)
-                 when 'string'
-                   ::ActiveRecord::Type::String.new.type_cast_from_database(column.default)
-                 else
-                   raise "#{column.cast_type} not supportted"
-                 end
+        @value = column.send(type_cast, column.default)
         attributes[:value] = column.default
       end
     end
@@ -79,7 +71,15 @@ module HydraAttribute
       def column(hydra_attribute_id)
         nested_identity_map(:column).cache(hydra_attribute_id.to_i) do
           hydra_attribute = ::HydraAttribute::HydraAttribute.find(hydra_attribute_id)
-          ::ActiveRecord::ConnectionAdapters::Column.new(hydra_attribute.name, hydra_attribute.default_value, hydra_attribute.backend_type)
+          if ::ActiveRecord.version >= ::Gem::Version.new('4.2.0')
+            backend_type = sql_type = hydra_attribute.backend_type
+            backend_type = ::HydraAttribute::BACKEND_TYPE_MAP[backend_type.to_sym].new
+            default_value = hydra_attribute.default_value
+            default_value = backend_type.type_cast_from_database(default_value) if backend_type.respond_to? :type_cast_from_database
+            ::ActiveRecord::ConnectionAdapters::Column.new(hydra_attribute.name, default_value, backend_type, sql_type)
+          else
+            ::ActiveRecord::ConnectionAdapters::Column.new(hydra_attribute.name, hydra_attribute.default_value, hydra_attribute.backend_type)
+          end
         end
       end
 
@@ -120,7 +120,8 @@ module HydraAttribute
     def value=(new_value)
       value_will_change! unless value == new_value
       @attributes[:value] = new_value
-      @value = column.type_cast(new_value)
+      type_cast = column.respond_to?(:type_cast) ? :type_cast : :type_cast_from_database
+      @value = column.send(type_cast, new_value)
     end
 
     # Returns not type cased value

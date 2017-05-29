@@ -4,7 +4,8 @@ config = {
   :database => ENV['DB_NAME']     || 'hydra_attribute_test',
   :username => ENV['DB_USERNAME'] || 'postgres',
   :password => ENV['DB_PASSWORD'],
-  :encoding => 'utf8'
+  :encoding => 'utf8',
+  :port => ENV['DB_PORT'] || '5432'
 }
 
 ActiveRecord::Base.establish_connection(config.merge(database: 'postgres', schema_search_path: 'public'))

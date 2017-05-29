@@ -11,7 +11,7 @@ describe HydraAttribute::Migrator do
     before do
       migrator.create :wheels do |t|
         t.string :name
-        t.timestamps
+        t.timestamps null: false
       end
     end
 
@@ -61,12 +61,12 @@ describe HydraAttribute::Migrator do
         column.null.should be_false
 
         column = columns.find { |c| c.name == 'default_value' }
-        column.sql_type.should == (ENV['DB'] == 'postgresql' ? 'character varying(255)' : 'varchar(255)')
+        (['character varying(255)', 'character varying', 'varchar(255)', 'varchar']).should include column.sql_type
         column.null.should be_true
 
         column = columns.find { |c| c.name == 'white_list' }
         column.null.should be_false
-        column.default.should be_false
+        ([false, 0, '0', 'f', 'F', 'false', 'FALSE', 'off', 'OFF']).should include column.default
         case ENV['DB']
         when 'postgresql' then column.sql_type.should == 'boolean'
         when 'mysql'      then column.sql_type.should == 'tinyint(1)'
@@ -239,9 +239,9 @@ describe HydraAttribute::Migrator do
         column = connection.columns('hydra_string_wheels').find { |c| c.name == 'value' }
         column.null.should be_true
         case ENV['DB']
-        when 'postgresql' then column.sql_type.should == 'character varying(255)'
-        when 'mysql'      then column.sql_type.should == 'varchar(255)'
-        when 'sqlite'     then column.sql_type.should == 'varchar(255)'
+        when 'postgresql' then (['character varying(255)', 'character varying']).should include column.sql_type
+        when 'mysql'      then (['varchar(255)', 'varchar']).should include column.sql_type
+        when 'sqlite'     then (['varchar(255)', 'varchar']).should include column.sql_type
         else raise 'Unknown database'
         end
 

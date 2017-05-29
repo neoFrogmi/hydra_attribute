@@ -60,6 +60,15 @@ module HydraAttribute
           order!(*args)
         end
 
+        def reverse_order!
+          return super if ::ActiveRecord.version < ::Gem::Version.new('4.2.0')
+          orders = hydra_order_values.uniq
+          orders.reject!(&:blank?)
+          orders = hydra_helper.quote_columns(orders)
+          self.hydra_order_values = reverse_sql_order(orders)
+          self
+        end
+
         def build_arel
           # remove duplicate columns and add table prefix to all of them
           self.group_values = hydra_helper.quote_columns(group_values.uniq.reject(&:blank?))

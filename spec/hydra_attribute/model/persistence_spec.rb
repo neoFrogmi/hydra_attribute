@@ -6,7 +6,7 @@ describe HydraAttribute::Model::Persistence do
       t.string  :name
       t.decimal :price, precision: 4, scale: 2
       t.integer :quantity
-      t.timestamps
+      t.timestamps null: false
     end
     Object.const_set('CustomProduct', Class.new)
     CustomProduct.send(:include, HydraAttribute::Model::Validations) # dependency
@@ -24,7 +24,7 @@ describe HydraAttribute::Model::Persistence do
         t.string  :title
         t.float   :price
         t.integer :count
-        t.timestamps
+        t.timestamps null: false
       end
       Object.const_set('ExampleProduct', Class.new)
       ExampleProduct.send(:include, HydraAttribute::Model::Persistence)
@@ -489,7 +489,7 @@ describe HydraAttribute::Model::Persistence do
         t.string  :title
         t.float   :price
         t.integer :count
-        t.timestamps
+        t.timestamps null: false
       end
       Object.const_set('ExampleProduct', Class.new)
       ExampleProduct.send(:include, HydraAttribute::Model)

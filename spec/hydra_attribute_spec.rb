@@ -29,8 +29,8 @@ describe HydraAttribute do
   end
 
   describe 'SUPPORTED_BACKEND_TYPES' do
-    it 'should include "string", "text", "integer", "float", "decimal", "boolean" and "datetime"' do
-      HydraAttribute::SUPPORTED_BACKEND_TYPES.should == %w[string text integer float decimal boolean datetime]
+    it 'should include "string", "text", "integer", "float", "decimal", "boolean", "datetime" "uuid"' do
+      HydraAttribute::SUPPORTED_BACKEND_TYPES.should == %w[string text integer float decimal boolean datetime uuid]
     end
   end
 end

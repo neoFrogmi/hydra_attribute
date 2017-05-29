@@ -1,7 +1,7 @@
 HydraAttribute::Migrator.new(ActiveRecord::Base.connection).create :rooms do |t|
   t.integer :flat_id
   t.integer :square
-  t.timestamps
+  t.timestamps null: false
 end
 
 class Room < ActiveRecord::Base

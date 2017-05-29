@@ -6,7 +6,7 @@ describe HydraAttribute::Model::Cacheable do
       t.string  :name
       t.float   :price
       t.integer :quantity
-      t.timestamps
+      t.timestamps null: false
     end
     Object.const_set('CustomProduct', Class.new)
     CustomProduct.send(:include, HydraAttribute::Model::Validations) # dependency
