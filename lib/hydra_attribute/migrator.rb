@@ -78,7 +78,7 @@ module HydraAttribute
       def create_set
         create_table :hydra_sets do |t|
           t.string :entity_type,  limit: 32, null: false
-          t.string :name,         limit: 32, null: false
+          t.string :name,         limit: 36, null: false
           t.timestamps                       null: false
         end
         add_index :hydra_sets, [:entity_type, :name], unique: true, name: 'hydra_sets_idx'

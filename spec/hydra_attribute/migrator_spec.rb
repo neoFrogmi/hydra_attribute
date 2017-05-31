@@ -114,7 +114,7 @@ describe HydraAttribute::Migrator do
         column.null.should be_false
 
         column = columns.find { |c| c.name == 'name' }
-        column.sql_type.should == (ENV['DB'] == 'postgresql' ? 'character varying(32)' : 'varchar(32)')
+        column.sql_type.should == (ENV['DB'] == 'postgresql' ? 'character varying(36)' : 'varchar(36)')
         column.null.should be_false
 
         column = columns.find { |c| c.name == 'created_at' }
